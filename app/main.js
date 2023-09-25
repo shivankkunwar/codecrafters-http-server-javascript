@@ -15,6 +15,7 @@ const server = net.createServer((socket) => {
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
     }
+    socket.end();
   });
   // Always send a response, even if no data is received
   socket.on('end', () => {
