@@ -9,7 +9,7 @@ const server = net.createServer((socket) => {
     const request = data.toString();
     const startLine = request.split("\r\n")[0];
     const path = startLine.split(" ")[1];
-
+    console.log(path);
     if (path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else {
