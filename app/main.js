@@ -20,6 +20,8 @@ const server = net.createServer((socket) => {
     } 
     if(path === "/user-agent"){
         const value= startLine[2].split(" ")[1];
+        console.log(value);
+        console.log(typeof(value));
         const response= `${reqPath} 200 OK \r\n\r\nContent-Type: text/plain\r\nContent-Length: ${value.length}\r\n\r\n${value}`;
     }
     
