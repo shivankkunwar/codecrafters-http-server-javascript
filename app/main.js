@@ -26,6 +26,7 @@ const server = net.createServer((socket) => {
     }
     else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+
     }
     socket.end();
   });
@@ -34,5 +35,5 @@ const server = net.createServer((socket) => {
     socket.end();
   });
 });
-
+//should work for multiple requests
 server.listen(4221, "localhost");
