@@ -18,7 +18,7 @@ const server = net.createServer((socket) => {
       const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${randomString.length}\r\n\r\n${randomString}`;
       socket.write(response);
     } 
-    if(startline.startsWith("GET /user-agent")){
+    if(path === "/user-agent"){
         const value= startLine[2].split(" ")[1];
         const response= `${reqPath} 200 OK \r\n\r\nContent-Type: text/plain\r\nContent-Length: ${value.length}\r\n\r\n${value}`;
     }
