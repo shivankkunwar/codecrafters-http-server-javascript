@@ -20,9 +20,8 @@ const server = net.createServer((socket) => {
       socket.write(response);
     } 
     else if(path === "/user-agent"){
-        const [extra, value]= request.split("\r\n").find(line => line.startsWith("User-Agent:")).split(": ")[1];;
-      
-        const response= `HTTP/1.1 200 OK \r\n\r\nContent-Type: text/plain\r\nContent-Length: ${value.length}\r\n\r\n${value}`;
+        const userAgent = request.split("\r\n").find(line => line.startsWith("User-Agent:")).split(": ")[1];      
+        const response= `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`;
         socket.write(response);
     }
     else {
