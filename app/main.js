@@ -26,7 +26,7 @@ const server = net.createServer((socket) => {
         socket.write(response);
     }
     else if(path.startsWith("/files/")){
-      let directory = process.argv[3];
+      let directory = process.argv[3]
 			let file = data.toString().slice(data.toString().indexOf("/") + 7, data.toString().indexOf(" HTTP"))
 			if (fs.existsSync(directory+file)) {
 				let fileContent = fs.readFileSync(directory + file)
