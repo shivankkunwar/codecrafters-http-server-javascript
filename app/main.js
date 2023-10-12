@@ -26,23 +26,17 @@ const server = net.createServer((socket) => {
         socket.write(response);
     }
     else if(path.startsWith("/files/")){
-        const filename = path.substring(7);
-        const filepath= `./${directory}/${filename}`;
+      const filename = path.substring(7);
+      const filepath = `./${directory}/${filename}`;
 
-        fs.readFile(filepath, (err, data) => {
-          if(err){
-            socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
-
-          }
-          else{
-            const response = `HTTP/1.1 200 OK\r\nContent-Type: ${data.length}\r\n\r\n${data}`;
-
-            socket.write(response);
-          }
-         
-        });
-        return ; // Return here to prevent socket.end() from being called before the file is read
-    }
+      try {
+        const data = fs.readFileSync(filepath);
+        const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${data.length}\r\n\r\n${data}`;
+        socket.write(response);
+      } catch (err) {
+        socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+      } 
+     }
     else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
 
