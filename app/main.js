@@ -35,7 +35,7 @@ const server = net.createServer((socket) => {
 
           }
           else{
-            const response = `HTTTP/1.1 200 OK\r\nContent-Type: ${data.length}\r\n\r\n${data}`;
+            const response = `HTTP/1.1 200 OK\r\nContent-Type: ${data.length}\r\n\r\n${data}`;
 
             socket.write(response);
           }
