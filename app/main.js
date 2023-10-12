@@ -25,29 +25,22 @@ const server = net.createServer((socket) => {
         const response= `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`;
         socket.write(response);
     }
-    else if(path.startsWith("/files/")){
-        const filename = path.substring(7);
-        const filepath= `./${directory}/${filename}`;
-
-        fs.readFile(filepath, (err, data) => {
-          if(err){
-            socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
-
-          }
-          else{
-            const response = `HTTTP/1.1 200 OK\r\nContent-Type: ${data.length}\r\n\r\n${data}`;
-
-            socket.write(response);
-          }
-         
-        });
-        return ; // Return here to prevent socket.end() from being called before the file is read
+    else if(path.startsWith("/files/")){ const filename = path.substring(7);
+      const filePath = `./${directory}/${filename}`;
+      fs.readFile(filePath, (err, data) => {
+        if (err) {
+          socket.write("HTTP/1.1 404 Not Found\r\n\r\n", () => socket.end());
+        } else {
+          socket.write("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: " + data.length + "\r\n\r\n", () => {
+            socket.write(data, () => socket.end());
+          });
+        }
+      });
+      return; // Return here to prevent calling socket.end() before the file is read
     }
     else {
-      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
-
+      socket.write("HTTP/1.1 404 Not Found\r\n\r\n", () => socket.end());
     }
-    socket.end();
   });
 
   socket.on("close", () => {
