@@ -26,35 +26,49 @@ const server = net.createServer((socket) => {
         socket.write(response);
     }
     else if(path.startsWith("/files") && command === "GET"){
-      let directory = process.argv[3];
-			let file = data.toString().slice(data.toString().indexOf("/") + 7, data.toString().indexOf(" HTTP"))
-			if (fs.existsSync(directory+file)) {
-				let fileContent = fs.readFileSync(directory + file)
-				socket.write(`HTTP/1.1 200 OK\r\n`)
-				socket.write(`Content-Type: application/octet-stream\r\n`)
-				socket.write(`Content-Length: ${fileContent.length}\r\n\r\n`)
-				socket.write(`${fileContent}\r\n`)
-				socket.end()
-			}
-			else {
-				socket.write("HTTP/1.1 404 Not Found\r\n\r\n")
-				socket.end()
-1
-1
-			}
+      const directory = process.argv[3];
+      // extract the filename
+      const filename = path.split("/files/")[1];
+      let response = "";
+      // if the file exists
+      if (fs.existsSync(`${directory}/${filename}`)) {
+        response += "HTTP/1.1 200 OK\r\n";
+        response += "Content-Type: application/octet-stream\r\n";
+        // read the file contents
+        const fileContent = fs.readFileSync(`${directory}/${filename}`, {
+          encoding: "utf8",
+          flag: "r",
+        });
+        // compute content length
+        response += `Content-Length: ${fileContent.length}\r\n`;
+        response += "\r\n";
+        // send the file contents back to the client
+        response += fileContent;
+      } else {
+        // if the file does not exist
+        response += "HTTP/1.1 404 Not Found\r\n";
+        response += "\r\n";
+      }
+      // send the response back to the client
+      socket.write(response);
      }
      else if ( path.startsWith("/files") && command === "POST") {
 
       const directory = process.argv[3];
+      // extract the filename
       const filename = path.split("/files/")[1];
+      let response = "";
+      // read the request body
       const requestBody = dataArr[dataArr.length - 1];
-      console.log("writing to file.. ");
+      console.log("writing to file..");
       try {
+        // write the request body to the file
         fs.writeFileSync(`${directory}/${filename}`, requestBody);
-        socket.write("HTTP/1.1 201 Created\r\n\r\n");
-      } catch (err) {
-        socket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-      }
+        response += "HTTP/1.1 201 Created\r\n";
+        response += "\r\n";
+      } catch (err) {}
+      // send the response back to the client
+      socket.write(response);
      }
     else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
