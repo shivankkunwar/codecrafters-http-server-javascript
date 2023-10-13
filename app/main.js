@@ -26,22 +26,34 @@ const server = net.createServer((socket) => {
         socket.write(response);
     }
     else if(path.startsWith("/files/")){
-      let directory = process.argv[3];
-			let file = data.toString().slice(data.toString().indexOf("/") + 7, data.toString().indexOf(" HTTP"))
-			if (fs.existsSync(directory+file)) {
-				let fileContent = fs.readFileSync(directory + file)
-				socket.write(`HTTP/1.1 200 OK\r\n`)
-				socket.write(`Content-Type: application/octet-stream\r\n`)
-				socket.write(`Content-Length: ${fileContent.length}\r\n\r\n`)
-				socket.write(`${fileContent}\r\n`)
-				socket.end()
-			}
-      
-			else {
-				socket.write("HTTP/1.1 404 Not Found\r\n\r\n")
-				socket.end()
+      const filename = path.substring(7);
+      const filepath = `./${directory}/${filename}`;
 
-			}
+      if (command === "POST") {
+        const contentLength = request.split("\r\n").find(line => line.startsWith("Content-Length:")).split(": ")[1];
+        const requestBody = request.split("\r\n\r\n")[1];
+
+        fs.writeFile(filepath, requestBody, (err) => {
+          if (err) {
+            socket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+          } else {
+            socket.write("HTTP/1.1 201 Created\r\n\r\n");
+          }
+          socket.end();
+        });
+      }
+      else if (command === "GET") {
+        if (fs.existsSync(filepath)) {
+          const fileContent = fs.readFileSync(filepath);
+          socket.write(`HTTP/1.1 200 OK\r\n`);
+          socket.write(`Content-Type: application/octet-stream\r\n`);
+          socket.write(`Content-Length: ${fileContent.length}\r\n\r\n`);
+          socket.write(`${fileContent}\r\n`);
+        } else {
+          socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+        }
+        socket.end();
+      }
      }
     else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
