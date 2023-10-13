@@ -24,6 +24,24 @@ const server = net.createServer((socket) => {
         const userAgent = request.split("\r\n").find(line => line.startsWith("User-Agent:")).split(": ")[1];      
         const response= `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`;
         socket.write(response);
+    } else if (command === "POST" && path.startsWith("/files/")) {
+      // Handle POST requests to save files
+      const filename = path.substring(7);
+      const fileStream = fs.createWriteStream(directory + "/" + filename);
+      const fileData = [];
+
+      socket.on("data", (chunk) => {
+        fileData.push(chunk);
+      });
+
+      socket.on("end", () => {
+        const fileContent = Buffer.concat(fileData);
+        fileStream.write(fileContent);
+        fileStream.end();
+
+        socket.write("HTTP/1.1 201 Created\r\n\r\n");
+        socket.end();
+      });
     }
     else if(path.startsWith("/files/")){
       let directory = process.argv[3];
