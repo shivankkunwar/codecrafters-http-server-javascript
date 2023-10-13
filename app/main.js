@@ -8,7 +8,7 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = data.toString();
-    const dataArr= data.split("/r/n");
+    const dataArr= request.split("/r/n");
     const startLine = request.split("\r\n")[0];
     const[command, path, reqPath]  = startLine.split(" ");
     console.log(path);
