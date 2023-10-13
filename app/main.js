@@ -45,22 +45,16 @@ const server = net.createServer((socket) => {
      }
      else if ( path.startsWith("/files") && command === "POST") {
 
-        const directory = process.argv[3];
-        const filename = path.split("/files/")[1];
-
-        let response = "";
-
-        const requestBody = dataArr[dataArr.length -1];
-
-        console.log("writing to file.. ");
-
-        try{
-          fs.writeFileSync(`${directory}/${filename}`, requestBody);
-          response += "HTTP/1.1 201 Created\r\n";
-          response += "\r\n";
-        } catch (err) {}
-        // send the response back to the client
-        socket.write(response);
+      const directory = process.argv[3];
+      const filename = path.split("/files/")[1];
+      const requestBody = dataArr[dataArr.length - 1];
+      console.log("writing to file.. ");
+      try {
+        fs.writeFileSync(`${directory}/${filename}`, requestBody);
+        socket.write("HTTP/1.1 201 Created\r\n\r\n");
+      } catch (err) {
+        socket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+      }
      }
     else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
